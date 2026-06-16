@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Black Smoke Factory · Galios kėlimas ir ChipTuning Vilniuje</title>
+<meta name="description" content="Black Smoke Factory – ChipTuning, ECU programavimas, galios kėlimas Vilniuje. EGR/DPF/DTC šalinimas, Stage1-Stage3, dyno matavimai. Senojo kelio g. 1, Daržininkai.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══ TOKENS ═══
+Color: bg #0a0a0a, bg2 #131313, surface #1a1a1a, line #2a2a2a,
+       ink #f2f0ec, ink2 #9a9690, red #e8332a (gauge danger / power accent),
+       smoke #4a4a4a
+Type: Oswald (display, condensed industrial - echoes logo lettering),
+      Inter (body), JetBrains Mono (data: kW/Nm/specs)
+Signature: rising dyno-graph line motif (echoes logo's chart-arrow), used as
+      a recurring divider/accent across sections; before->after power numbers
+      treated as the hero content itself
+*/
+:root{
+  --bg:#0a0a0a;
+  --bg2:#111110;
+  --surface:#1a1a18;
+  --surface2:#211f1c;
+  --line:#2b2926;
+  --line2:#3a3733;
+  --ink:#f2f0ec;
+  --ink2:#a8a39c;
+  --ink3:#6b6862;
+  --red:#e8332a;
+  --red2:#c4241c;
+  --red-dim:rgba(232,51,42,.14);
+  --ok:#5ec98a;
+  --r:2px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);color:var(--ink);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  font-size:16px;line-height:1.5;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+
+/* ═══ UTILITY BAR ═══ */
+.util-bar{background:var(--bg2);border-bottom:1px solid var(--line);height:36px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px}
+.util-inner{max-width:1280px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.util-left{display:flex;align-items:center;gap:0}
+.util-tick{display:flex;align-items:center;gap:6px;color:var(--ink3);padding:0 14px;border-right:1px solid var(--line);height:36px}
+.util-tick:first-child{padding-left:0}
+.util-tick::before{content:"●";color:var(--red);font-size:8px}
+.util-tick.hide-sm{display:none}
+.util-right{display:flex;align-items:center;gap:8px}
+.util-phone{color:var(--ink2);font-weight:500;letter-spacing:.02em}
+.util-phone:hover{color:var(--ink)}
+@media(min-width:700px){.util-tick.hide-sm{display:flex}}
+
+/* ═══ NAV ═══ */
+nav{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-brand{display:flex;align-items:center;gap:11px;cursor:pointer;flex-shrink:0}
+.nav-logo{height:38px;width:38px;border-radius:50%;object-fit:cover;border:1px solid var(--line2);flex-shrink:0}
+.nav-brand-text{line-height:1.05}
+.nav-brand-name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:.01em;text-transform:uppercase;color:var(--ink)}
+.nav-brand-name span{color:var(--red)}
+.nav-brand-sub{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.nav-links{display:none;align-items:center;gap:2px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:var(--ink2);padding:9px 14px;border-radius:var(--r);transition:color .15s,background .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--ink);background:var(--surface)}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-tel{display:none;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--ink2)}
+.nav-tel:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13.5px;letter-spacing:.01em;padding:11px 20px;border-radius:var(--r);transition:transform .15s,background .15s,border-color .15s,box-shadow .15s;white-space:nowrap;cursor:pointer}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,51,42,.3)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+.btn-ghost:hover{border-color:var(--ink3);background:var(--surface)}
+.burger{display:flex;flex-direction:column;gap:5px;padding:8px;cursor:pointer}
+.burger span{width:22px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media(min-width:860px){.nav-links{display:flex}.nav-tel{display:block}.burger{display:none}}
+
+/* ═══ MOBILE MENU ═══ */
+.mob-menu{position:fixed;inset:0;top:0;background:var(--bg);z-index:60;display:none;flex-direction:column;padding:88px 28px 28px;overflow-y:auto}
+.mob-menu.open{display:flex}
+.mob-links{list-style:none;display:flex;flex-direction:column;gap:2px;margin-bottom:28px}
+.mob-links a{font-family:'Oswald',sans-serif;font-size:26px;font-weight:600;text-transform:uppercase;color:var(--ink);padding:14px 0;border-bottom:1px solid var(--line);display:block}
+.mob-cta{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.mob-cta .btn{width:100%;padding:15px}
+.mob-cta-info{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);text-align:center;margin-top:6px}
+
+/* ═══ HERO ═══ */
+.hero{position:relative;padding:56px 0 0;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.32;filter:grayscale(.2) contrast(1.05)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.55) 0%,rgba(10,10,10,.75) 55%,var(--bg) 100%)}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:36px;padding-bottom:48px}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:var(--red-dim);border:1px solid rgba(232,51,42,.3);padding:6px 12px;border-radius:100px;margin-bottom:22px}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(40px,7.5vw,76px);line-height:.98;letter-spacing:-.01em;text-transform:uppercase;color:var(--ink);margin-bottom:22px}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero-sub{font-size:16px;color:var(--ink2);max-width:560px;line-height:1.7;margin-bottom:30px}
+.hero-sub strong{color:var(--ink);font-weight:600}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+
+/* power readout - signature element */
+.power-readout{
+  background:var(--surface);border:1px solid var(--line2);border-radius:6px;
+  padding:22px 24px;max-width:560px;position:relative;overflow:hidden;
+}
+.power-readout-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+.power-rows{display:flex;align-items:center;gap:18px}
+.power-col{flex:1}
+.power-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(22px,4vw,30px);color:var(--ink2);line-height:1}
+.power-col.after .power-num{color:var(--red)}
+.power-unit{font-size:13px;color:var(--ink3);margin-left:3px;font-weight:500}
+.power-arrow{color:var(--ink3);font-size:20px;flex-shrink:0}
+.power-graph{position:absolute;right:-6px;bottom:-6px;width:120px;height:60px;opacity:.5}
+
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:28px}
+.hmc{padding:16px 14px;border-right:1px solid var(--line);background:var(--surface)}
+.hmc:last-child{border-right:none}
+.hmc-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;color:var(--ink);line-height:1;margin-bottom:4px}
+.hmc-label{font-size:9.5px;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase}
+@media(max-width:520px){.hero-meta{grid-template-columns:repeat(2,1fr)}.hmc:nth-child(2n){border-right:none}.hmc:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+/* ═══ TICKER ═══ */
+.ticker{background:var(--red);overflow:hidden;padding:9px 0;white-space:nowrap}
+.ticker-track{display:inline-block;animation:tick 28s linear infinite}
+.ticker-seg{display:inline-block;padding-right:40px}
+.ticker-seg,.ticker-seg *{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.04em;color:#fff;text-transform:uppercase}
+.ticker-dot{margin:0 16px;opacity:.6}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ═══ SECTION GENERIC ═══ */
+section{padding:88px 0}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:48px;flex-wrap:wrap}
+.section-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.section-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(28px,4vw,44px);text-transform:uppercase;letter-spacing:-.01em;color:var(--ink);line-height:1.05}
+.section-title em{font-style:normal;color:var(--red)}
+.section-desc{max-width:380px;font-size:14px;color:var(--ink2);line-height:1.7}
+
+/* ═══ SERVICES GRID ═══ */
+.svc-grid{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+@media(min-width:700px){.svc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1040px){.svc-grid{grid-template-columns:repeat(3,1fr)}}
+.svc{background:var(--bg);padding:30px 26px;display:flex;flex-direction:column;transition:background .2s}
+.svc:hover{background:var(--surface)}
+.svc-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:.1em;margin-bottom:18px}
+.svc-icon{width:42px;height:42px;border-radius:6px;background:var(--red-dim);border:1px solid rgba(232,51,42,.25);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:16px}
+.svc-name{font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;text-transform:uppercase;color:var(--ink);margin-bottom:9px;letter-spacing:.01em}
+.svc-desc{font-size:13.5px;color:var(--ink2);line-height:1.65;flex:1;margin-bottom:18px}
+.svc-foot{display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.svc-foot .price{color:var(--red);font-weight:600}
+.svc-foot .lnk{color:var(--ink3)}
+.svc:hover .svc-foot .lnk{color:var(--red)}
+
+/* ═══ STAGES (flagship) ═══ */
+.stage-band{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:8px}
+@media(min-width:860px){.stage-grid{grid-template-columns:repeat(3,1fr)}}
+.stage-card{background:var(--bg);padding:32px 28px;position:relative}
+.stage-card.featured{background:var(--surface)}
+.stage-badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:0 0 0 6px}
+.stage-name{font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:var(--ink);margin-bottom:6px}
+.stage-gain{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--red);font-weight:600;margin-bottom:18px}
+.stage-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.stage-list li{font-size:13px;color:var(--ink2);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.stage-list li::before{content:'+';color:var(--red);font-weight:700;flex-shrink:0}
+
+/* ═══ EXAMPLES TABLE ═══ */
+.examples-wrap{margin-top:56px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ex-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px;padding:16px 22px;border-bottom:1px solid var(--line);align-items:center}
+.ex-row:last-child{border-bottom:none}
+.ex-row.head{background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.ex-car{font-size:14px;font-weight:600;color:var(--ink)}
+.ex-stage{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);margin-top:2px}
+.ex-power{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--ink2)}
+.ex-power b{color:var(--red);font-weight:700}
+@media(max-width:600px){.ex-row{grid-template-columns:1fr;gap:6px}.ex-row.head{display:none}}
+
+/* ═══ PROCESS ═══ */
+.proc-grid{display:grid;grid-template-columns:1fr;gap:32px}
+@media(min-width:860px){.proc-grid{grid-template-columns:repeat(4,1fr)}}
+.proc-step{position:relative}
+.proc-num{font-family:'Oswald',sans-serif;font-weight:700;font-size:46px;color:var(--line2);line-height:1;margin-bottom:14px}
+.proc-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+.proc-desc{font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* ═══ GALLERY ═══ */
+.gal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:700px){.gal-grid{grid-template-columns:repeat(4,1fr)}}
+.gal-item{position:relative;aspect-ratio:1;overflow:hidden;border-radius:6px;background:var(--surface);cursor:pointer}
+.gal-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease,filter .3s}
+.gal-item:hover img{transform:scale(1.07)}
+.gal-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#fff;opacity:0;transition:opacity .25s}
+.gal-item:hover .gal-cap{opacity:1}
+
+/* ═══ ABOUT / WHY ═══ */
+.why-grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:start}
+@media(min-width:900px){.why-grid{grid-template-columns:1fr 1fr}}
+.why-p{font-size:15px;color:var(--ink2);line-height:1.75;margin-bottom:16px}
+.why-p strong{color:var(--ink);font-weight:600}
+.why-list{display:flex;flex-direction:column}
+.why-item{display:flex;align-items:flex-start;gap:14px;padding:17px 0;border-bottom:1px solid var(--line)}
+.why-item:first-child{border-top:1px solid var(--line)}
+.why-icon{width:34px;height:34px;border-radius:6px;background:var(--red-dim);border:1px solid rgba(232,51,42,.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
+.why-text h4{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.why-text p{font-size:12.5px;color:var(--ink3);line-height:1.55}
+
+/* ═══ CTA BAND ═══ */
+.cta-band{background:linear-gradient(135deg,var(--red2),var(--red));padding:56px 0}
+.cta-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.cta-band h2{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(24px,3.5vw,36px);text-transform:uppercase;color:#fff;line-height:1.05}
+.cta-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cta-phone{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#fff}
+.cta-note{font-size:11px;color:rgba(255,255,255,.7);font-family:'JetBrains Mono',monospace}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,.5);color:#fff}
+.cta-band .btn-ghost:hover{background:rgba(255,255,255,.12);border-color:#fff}
+
+/* ═══ FOOTER ═══ */
+footer{background:var(--bg2);border-top:1px solid var(--line);padding:48px 0 26px}
+.foot-top{display:grid;grid-template-columns:1fr;gap:32px;margin-bottom:36px}
+@media(min-width:760px){.foot-top{grid-template-columns:1.3fr 1fr 1fr 1fr}}
+.foot-brand{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;color:var(--ink);margin-bottom:9px}
+.foot-brand span{color:var(--red)}
+.foot-desc{font-size:12.5px;color:var(--ink3);max-width:240px;line-height:1.6}
+.foot-col-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:13px}
+.foot-links{list-style:none;display:flex;flex-direction:column;gap:8px}
+.foot-links a{font-size:13px;color:var(--ink2)}
+.foot-links a:hover{color:var(--ink)}
+.foot-bottom{border-top:1px solid var(--line);padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.foot-copy{font-size:11.5px;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+.foot-made span{color:var(--red)}
+
+/* ═══ PAGES ═══ */
+.page{display:none}
+.page.active{display:block}
+
+/* ═══ BOOKING POPUP ═══ */
+.pop-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.pop-overlay.open{display:flex}
+.pop{background:var(--bg2);border:1px solid var(--line2);border-radius:10px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto}
+.pop-head{padding:22px 24px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.pop-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+.pop-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;color:var(--ink)}
+.pop-close{width:30px;height:30px;border-radius:6px;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:16px;flex-shrink:0;cursor:pointer}
+.pop-close:hover{background:var(--surface2);color:var(--ink)}
+.pop-body{padding:22px 24px 26px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.f-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.f-group:last-child{margin-bottom:0}
+.f-group label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+.f-group input,.f-group select,.f-group textarea{background:var(--bg);border:1px solid var(--line2);border-radius:var(--r);padding:11px 13px;color:var(--ink);font-size:14px;width:100%;-webkit-appearance:none;appearance:none}
+.f-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{outline:none;border-color:var(--red)}
+.f-note{font-size:11px;color:var(--ink3);text-align:center;margin-top:14px;font-family:'JetBrains Mono',monospace}
+.pop-success{display:none;text-align:center;padding:44px 26px}
+.pop-success.show{display:block}
+.pop-success-icon{font-size:44px;margin-bottom:14px}
+.pop-success-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+.pop-success-text{font-size:13.5px;color:var(--ink2);line-height:1.6}
+
+/* ═══ ABOUT PAGE / CONTACT PAGE ═══ */
+.page-top{padding:48px 0 0}
+.page-top-sub{font-size:14.5px;color:var(--ink2);max-width:520px;line-height:1.7;margin-top:14px}
+.about-numbers{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:48px}
+@media(min-width:700px){.about-numbers{grid-template-columns:repeat(4,1fr)}}
+.an-cell{background:var(--bg);padding:24px 20px;text-align:center}
+.an-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:24px;color:var(--ink)}
+.an-label{font-size:11px;color:var(--ink3);margin-top:5px}
+
+.contact-grid{display:grid;grid-template-columns:1fr;gap:40px}
+@media(min-width:900px){.contact-grid{grid-template-columns:1fr 1fr}}
+.contact-left h2{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);text-transform:uppercase;color:var(--ink);margin-bottom:28px;line-height:1.05}
+.contact-left h2 em{font-style:normal;color:var(--red)}
+.contact-items{display:flex;flex-direction:column}
+.ci{display:flex;align-items:flex-start;gap:16px;padding:19px 0;border-bottom:1px solid var(--line)}
+.ci:first-child{border-top:1px solid var(--line)}
+.ci-icon{width:38px;height:38px;border-radius:6px;background:var(--red-dim);border:1px solid rgba(232,51,42,.25);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ci-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.ci-val{font-size:15px;color:var(--ink);font-weight:500}
+.ci-val a:hover{color:var(--red)}
+.ci-note{font-size:12px;color:var(--ink3);margin-top:2px}
+.hours-box{background:var(--surface);border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin-top:8px}
+.hours-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);font-size:13px}
+.hours-row:last-child{border-bottom:none}
+.hours-row.today{background:var(--red-dim)}
+.hours-row .day{color:var(--ink2)}
+.hours-row.today .day{color:var(--red);font-weight:600}
+.hours-row .time{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;color:var(--ink)}
+.hours-row .time.closed{color:var(--ink3);font-weight:400}
+.map-box{position:relative;border:1px solid var(--line2);border-radius:8px;overflow:hidden;aspect-ratio:4/3;background:var(--surface)}
+.map-box img{width:100%;height:100%;object-fit:cover;opacity:.5}
+.map-box-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(180deg,rgba(10,10,10,.3),rgba(10,10,10,.85))}
+.map-box-icon{font-size:32px}
+.map-box-addr{font-size:14.5px;font-weight:700;color:var(--ink);text-align:center;padding:0 20px}
+.map-box-city{font-size:11.5px;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+.map-link{margin-top:10px;font-size:12px;color:var(--red);border-bottom:1px solid var(--red);padding-bottom:1px}
+.map-link:hover{color:#fff;border-color:#fff}
+
+@media(max-width:520px){
+  .nav-inner{height:60px}
+  .nav-brand-sub{display:none}
+  section{padding:60px 0}
+  .section-head{flex-direction:column;align-items:flex-start;gap:10px}
+  .section-desc{text-align:left;max-width:100%}
+  .cta-inner{flex-direction:column;align-items:flex-start}
+  .hero-cta .btn{flex:1;justify-content:center}
+  .power-rows{flex-direction:column;align-items:flex-start;gap:10px}
+  .power-arrow{transform:rotate(90deg)}
+  .pop-head,.pop-body{padding-left:18px;padding-right:18px}
+  .f-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- UTILITY BAR -->
+<div class="util-bar">
+  <div class="util-inner">
+    <div class="util-left">
+      <span class="util-tick">Senojo kelio g. 1, Daržininkai</span>
+      <span class="util-tick hide-sm">Stage1–Stage3</span>
+      <span class="util-tick hide-sm">Dyno matavimas</span>
+    </div>
+    <div class="util-right">
+      <span style="color:var(--ok);font-size:9px">●</span>
+      <a href="tel:+37067799741" class="util-phone">+370 677 99741</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand" onclick="showPage('home')">
+      <img src="img/logo.jpg" alt="Black Smoke Factory" class="nav-logo">
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Black<span>Smoke</span>Factory</div>
+        <div class="nav-brand-sub">ChipTuning · Vilnius</div>
+      </div>
+    </div>
+    <ul class="nav-links">
+      <li><a id="nav-home" class="active" onclick="showPage('home')">Pradžia</a></li>
+      <li><a id="nav-services" onclick="showPage('services')">Paslaugos</a></li>
+      <li><a id="nav-gallery" onclick="showPage('gallery')">Darbai</a></li>
+      <li><a id="nav-about" onclick="showPage('about')">Apie mus</a></li>
+      <li><a id="nav-contact" onclick="showPage('contact')">Kontaktai</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="tel:+37067799741" class="nav-tel">+370 677 99741</a>
+      <button class="btn btn-primary" onclick="openBooking()">Užklausa</button>
+      <button class="burger" id="burger" onclick="toggleMenu()" aria-label="Meniu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <ul class="mob-links">
+    <li><a onclick="showPage('home');closeMenu()">Pradžia</a></li>
+    <li><a onclick="showPage('services');closeMenu()">Paslaugos</a></li>
+    <li><a onclick="showPage('gallery');closeMenu()">Darbai</a></li>
+    <li><a onclick="showPage('about');closeMenu()">Apie mus</a></li>
+    <li><a onclick="showPage('contact');closeMenu()">Kontaktai</a></li>
+  </ul>
+  <div class="mob-cta">
+    <a href="tel:+37067799741" class="btn btn-ghost">📞 Skambinti dabar</a>
+    <button class="btn btn-primary" onclick="openBooking();closeMenu()">Siųsti užklausą</button>
+    <div class="mob-cta-info">Pr–Pt 9:00–18:00 · Šeštadienis 9:00–15:00</div>
+  </div>
+</div>
+
+<!-- ══════════════════ HOME ══════════════════ -->
+<div id="home" class="page active">
+
+  <section class="hero">
+    <div class="hero-bg"><img src="img/dyno-room.jpg" alt=""></div>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-tag">Vilnius · Daržininkai · Visos markės</div>
+          <h1>Daugiau galios.<br>Mažiau <em>dūmų.</em></h1>
+          <p class="hero-sub">Black Smoke Factory atlieka <strong>ChipTuning ir ECU programavimą</strong> benzininiams, dyzeliniams ir elektriniams varikliams. Stage1–Stage3, EGR/DPF/DTC šalinimas, AdBlue ir greičio ribotuvo koregavimas — su matavimu ant dyno stendo prieš ir po.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" onclick="openBooking()">📋 Užsisakyti programavimą</button>
+            <a href="tel:+37067799741" class="btn btn-ghost">📞 +370 677 99741</a>
+          </div>
+
+          <div class="power-readout">
+            <div class="power-readout-label">Tipinis rezultatas · BMW 525d N57</div>
+            <div class="power-rows">
+              <div class="power-col">
+                <div class="power-num">150<span class="power-unit">kW</span></div>
+                <div class="power-num" style="font-size:14px;color:var(--ink3);margin-top:4px">450<span class="power-unit">Nm</span></div>
+              </div>
+              <div class="power-arrow">→</div>
+              <div class="power-col after">
+                <div class="power-num">185<span class="power-unit">kW</span></div>
+                <div class="power-num" style="font-size:14px;color:var(--red);margin-top:4px">560<span class="power-unit">Nm</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-meta">
+            <div class="hmc"><div class="hmc-val">St1–St3</div><div class="hmc-label">Programų lygiai</div></div>
+            <div class="hmc"><div class="hmc-val">4×4</div><div class="hmc-label">Dyno stendas</div></div>
+            <div class="hmc"><div class="hmc-val">KESS/CMD</div><div class="hmc-label">Programavimo įranga</div></div>
+            <div class="hmc"><div class="hmc-val">✓</div><div class="hmc-label">Backup saugomas</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-seg">ChipTuning<span class="ticker-dot">◆</span>Stage1 Stage2 Stage3<span class="ticker-dot">◆</span>EGR / DPF / DTC šalinimas<span class="ticker-dot">◆</span>AdBlue OFF<span class="ticker-dot">◆</span>Greičio ribotuvo išjungimas<span class="ticker-dot">◆</span>Dyno matavimas 4×4<span class="ticker-dot">◆</span>Benzinas · Dyzelis · Elektromobiliai<span class="ticker-dot">◆</span></span>
+      <span class="ticker-seg">ChipTuning<span class="ticker-dot">◆</span>Stage1 Stage2 Stage3<span class="ticker-dot">◆</span>EGR / DPF / DTC šalinimas<span class="ticker-dot">◆</span>AdBlue OFF<span class="ticker-dot">◆</span>Greičio ribotuvo išjungimas<span class="ticker-dot">◆</span>Dyno matavimas 4×4<span class="ticker-dot">◆</span>Benzinas · Dyzelis · Elektromobiliai<span class="ticker-dot">◆</span></span>
+    </div>
+  </div>
+
+  <!-- SERVICES PREVIEW -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">[01] · Ką darome</div>
+          <div class="section-title">Programavimo <em>paslaugos</em></div>
+        </div>
+        <p class="section-desc">Nuo ekonomiško Stage1 derinimo iki pilno EGR/DPF šalinimo — viskas su matavimu ant stendo ir saugomu originalo backup'u.</p>
+      </div>
+      <div class="svc-grid">
+        <div class="svc">
+          <div class="svc-num">01</div>
+          <div class="svc-icon">⚡</div>
+          <div class="svc-name">ChipTuning Stage1</div>
+          <p class="svc-desc">Saugus galios derinimas gamykliniams komponentams. +15–25% galios ir sukimo momento, mažesnės kuro sąnaudos.</p>
+          <div class="svc-foot"><span class="price">nuo 120€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">02</div>
+          <div class="svc-icon">🔧</div>
+          <div class="svc-name">EGR / DPF / DTC</div>
+          <p class="svc-desc">Suodžių filtro, EGR vožtuvo programinis šalinimas ir klaidų kodų užblokavimas. Sprendžiame pasikartojančias gedimų problemas.</p>
+          <div class="svc-foot"><span class="price">nuo 80€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">03</div>
+          <div class="svc-icon">💧</div>
+          <div class="svc-name">AdBlue OFF</div>
+          <p class="svc-desc">AdBlue/SCR sistemos programinis išjungimas sunkvežimiams, mikroautobusams ir lengviesiems automobiliams.</p>
+          <div class="svc-foot"><span class="price">nuo 100€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">04</div>
+          <div class="svc-icon">🚧</div>
+          <div class="svc-name">Greičio ribotuvas</div>
+          <p class="svc-desc">Gamyklinio greičio ribotuvo koregavimas arba pilnas išjungimas. Aktualu komercinei technikai ir VIP automobiliams.</p>
+          <div class="svc-foot"><span class="price">nuo 60€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">05</div>
+          <div class="svc-icon">📊</div>
+          <div class="svc-name">Dyno matavimas</div>
+          <p class="svc-desc">Tikslus galios ir sukimo momento matavimas ant 4×4 stendo prieš ir po programavimo — su grafiko ataskaita.</p>
+          <div class="svc-foot"><span class="price">nuo 40€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">06</div>
+          <div class="svc-icon">🛡️</div>
+          <div class="svc-name">ECU atrakinimas</div>
+          <p class="svc-desc">Užrakintų valdymo blokų (pvz. SID212EVO ir kt.) atrakinimas ir paruošimas programavimui.</p>
+          <div class="svc-foot"><span class="price">Individualiai</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGE LEVELS -->
+  <div class="stage-band">
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="section-tag">[02] · Flagship · Programų lygiai</div>
+            <div class="section-title">Stage1 / Stage2 / <em>Stage3</em></div>
+          </div>
+          <p class="section-desc">Kiekvienas lygis pritaikomas individualiai pagal variklio būklę ir jūsų tikslus — saugus derinimas visada svarbiau nei maksimalūs skaičiai.</p>
+        </div>
+        <div class="stage-grid">
+          <div class="stage-card">
+            <div class="stage-name">Stage 1</div>
+            <div class="stage-gain">+15–25% galios</div>
+            <ul class="stage-list">
+              <li>Gamykliniai turbina, suspaudimas, sankaba</li>
+              <li>Saugus kasdieniam naudojimui</li>
+              <li>Geresnė dinamika, mažesnės kuro sąnaudos</li>
+              <li>Be mechaninių pakeitimų</li>
+            </ul>
+          </div>
+          <div class="stage-card featured">
+            <div class="stage-badge">Populiariausia</div>
+            <div class="stage-name">Stage 2</div>
+            <div class="stage-gain">+25–40% galios</div>
+            <ul class="stage-list">
+              <li>Reikalauja sustiprintos sankabos/intake</li>
+              <li>Agresyvesnis derinimas ant dyno stendo</li>
+              <li>Individualus žemėlapis pagal modifikacijas</li>
+              <li>Pilnas matavimas prieš/po</li>
+            </ul>
+          </div>
+          <div class="stage-card">
+            <div class="stage-name">Stage 3</div>
+            <div class="stage-gain">+40%+ galios</div>
+            <ul class="stage-list">
+              <li>Reikalingos mechaninės modifikacijos</li>
+              <li>Maksimalus saugus derinimas</li>
+              <li>Individuali konsultacija būtina</li>
+              <li>Daugkartinis derinimas ant stendo</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="examples-wrap">
+          <div class="ex-row head"><div>Automobilis</div><div>Lygis</div><div>Galia / Sukimo momentas</div></div>
+          <div class="ex-row">
+            <div><div class="ex-car">BMW E60 525d</div><div class="ex-stage">145kW variklis · 2007m.</div></div>
+            <div class="ex-stage">Stage 2</div>
+            <div class="ex-power">145kW/400Nm → <b>185kW/559Nm</b></div>
+          </div>
+          <div class="ex-row">
+            <div><div class="ex-car">BMW E61 535d</div><div class="ex-stage">200kW variklis · 2004m.</div></div>
+            <div class="ex-stage">Stage 2+</div>
+            <div class="ex-power">200kW/560Nm → <b>272kW/740Nm</b></div>
+          </div>
+          <div class="ex-row">
+            <div><div class="ex-car">BMW F10 525d N57</div><div class="ex-stage">2011m. · jau po 2 metų St2</div></div>
+            <div class="ex-stage">Stage 3</div>
+            <div class="ex-power">310kW/750Nm → <b>340kW/940Nm</b></div>
+          </div>
+          <div class="ex-row">
+            <div><div class="ex-car">VW Arteon 2.0TDI</div><div class="ex-stage">ECU + TCU derinimas</div></div>
+            <div class="ex-stage">Stage 1 lite</div>
+            <div class="ex-power">110kW/350Nm → <b>130kW/400Nm</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROCESS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">[03] · Kaip dirbame</div>
+          <div class="section-title">Procesas <em>žingsniais</em></div>
+        </div>
+      </div>
+      <div class="proc-grid">
+        <div class="proc-step">
+          <div class="proc-num">01</div>
+          <div class="proc-title">Diagnostika</div>
+          <div class="proc-desc">Patikriname variklio būklę, klaidų kodus ir esamą ECU versiją prieš pradedant darbą.</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">02</div>
+          <div class="proc-title">Backup ir nuskaitymas</div>
+          <div class="proc-desc">Originalus žemėlapis nuskaitomas ir saugomas — galimybė bet kada grįžti į gamyklinius nustatymus.</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">03</div>
+          <div class="proc-title">Programavimas</div>
+          <div class="proc-desc">Individualus derinimas su KESS/CMD Flash įranga, atsižvelgiant į jūsų automobilio specifiką.</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">04</div>
+          <div class="proc-title">Matavimas ant dyno</div>
+          <div class="proc-desc">Galios ir sukimo momento patikra ant 4×4 stendo — rezultatas su grafiku jums į rankas.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <div class="wrap cta-inner">
+      <h2>Pasiruošę<br>daugiau galios?</h2>
+      <div class="cta-actions">
+        <a href="tel:+37067799741" class="cta-phone">+370 677 99741</a>
+        <span class="cta-note">Pr–Pt 9:00–18:00 · Š 9:00–15:00</span>
+        <button class="btn btn-ghost" onclick="openBooking()">Siųsti užklausą</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-top">
+        <div>
+          <div class="foot-brand">Black<span>Smoke</span>Factory</div>
+          <p class="foot-desc">ChipTuning ir variklių galingumo optimizavimas Vilniuje. Benzinas, dyzelis, elektromobiliai.</p>
+        </div>
+        <div>
+          <div class="foot-col-title">Navigacija</div>
+          <ul class="foot-links">
+            <li><a onclick="showPage('home')">Pradžia</a></li>
+            <li><a onclick="showPage('services')">Paslaugos</a></li>
+            <li><a onclick="showPage('gallery')">Darbai</a></li>
+            <li><a onclick="showPage('about')">Apie mus</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="foot-col-title">Paslaugos</div>
+          <ul class="foot-links">
+            <li><a onclick="showPage('services')">ChipTuning</a></li>
+            <li><a onclick="showPage('services')">EGR/DPF šalinimas</a></li>
+            <li><a onclick="showPage('services')">AdBlue OFF</a></li>
+            <li><a onclick="showPage('services')">Dyno matavimas</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="foot-col-title">Kontaktai</div>
+          <ul class="foot-links">
+            <li><a href="tel:+37067799741">+370 677 99741</a></li>
+            <li><a href="https://www.facebook.com/BlackSmokeFactory/" target="_blank">Facebook</a></li>
+            <li style="color:var(--ink3);font-size:12px">Senojo kelio g. 1, Daržininkai</li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span class="foot-copy">© 2026 Black Smoke Factory</span>
+        <span class="foot-copy foot-made">Demo · <span>built.lt</span></span>
+      </div>
+    </div>
+  </footer>
+</div>
+<!-- END HOME -->
+
+<!-- ══════════════════ SERVICES PAGE ══════════════════ -->
+<div id="services" class="page">
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-seg">ChipTuning<span class="ticker-dot">◆</span>Stage1 Stage2 Stage3<span class="ticker-dot">◆</span>EGR / DPF / DTC šalinimas<span class="ticker-dot">◆</span>AdBlue OFF<span class="ticker-dot">◆</span>Greičio ribotuvo išjungimas<span class="ticker-dot">◆</span>Dyno matavimas 4×4<span class="ticker-dot">◆</span></span>
+      <span class="ticker-seg">ChipTuning<span class="ticker-dot">◆</span>Stage1 Stage2 Stage3<span class="ticker-dot">◆</span>EGR / DPF / DTC šalinimas<span class="ticker-dot">◆</span>AdBlue OFF<span class="ticker-dot">◆</span>Greičio ribotuvo išjungimas<span class="ticker-dot">◆</span>Dyno matavimas 4×4<span class="ticker-dot">◆</span></span>
+    </div>
+  </div>
+  <div class="page-top">
+    <div class="wrap">
+      <div class="section-tag">Viskas vienoje vietoje</div>
+      <h1 class="section-title">Visos <em>paslaugos</em></h1>
+      <p class="page-top-sub">Specializuojamės variklių valdymo programavime — nuo paprasto Stage1 derinimo iki sudėtingo ECU atrakinimo. Visi darbai su matavimu ant dyno stendo ir saugomu originalo backup'u.</p>
+    </div>
+  </div>
+  <section>
+    <div class="wrap">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-num">01</div><div class="svc-icon">⚡</div><div class="svc-name">ChipTuning Stage1</div><p class="svc-desc">Saugus galios derinimas gamykliniams komponentams. +15–25% galios ir sukimo momento, mažesnės kuro sąnaudos kasdieniame važiavime.</p><div class="svc-foot"><span class="price">nuo 120€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">02</div><div class="svc-icon">⚡</div><div class="svc-name">ChipTuning Stage2</div><p class="svc-desc">Agresyvesnis derinimas automobiliams su sustiprinta sankaba ar kitomis modifikacijomis. Individualus žemėlapis ant dyno stendo.</p><div class="svc-foot"><span class="price">nuo 180€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">03</div><div class="svc-icon">⚡</div><div class="svc-name">ChipTuning Stage3</div><p class="svc-desc">Maksimalus derinimas automobiliams su mechaninėmis modifikacijomis. Reikalinga individuali konsultacija ir kelis kartus matavimas.</p><div class="svc-foot"><span class="price">Individualiai</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">04</div><div class="svc-icon">🔧</div><div class="svc-name">EGR šalinimas</div><p class="svc-desc">Programinis EGR vožtuvo išjungimas — sprendžiame pasikartojančias klaidas ir gedimus, susijusius su išmetimo dujų recirkuliacija.</p><div class="svc-foot"><span class="price">nuo 80€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">05</div><div class="svc-icon">🔧</div><div class="svc-name">DPF / FAP šalinimas</div><p class="svc-desc">Suodžių filtro programinis išjungimas. Aktualu dažniems mažo nuotolio važiavimams, kai filtras nuolat užsikemša.</p><div class="svc-foot"><span class="price">nuo 100€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">06</div><div class="svc-icon">🔧</div><div class="svc-name">DTC klaidų blokavimas</div><p class="svc-desc">Konkrečių klaidų kodų programinis užblokavimas, kad jie nesikartotų prietaisų skydelyje po remonto.</p><div class="svc-foot"><span class="price">nuo 50€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">07</div><div class="svc-icon">💧</div><div class="svc-name">AdBlue / SCR OFF</div><p class="svc-desc">AdBlue sistemos programinis išjungimas sunkvežimiams, mikroautobusams ir lengviesiems dyzeliniams automobiliams.</p><div class="svc-foot"><span class="price">nuo 100€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">08</div><div class="svc-icon">🚧</div><div class="svc-name">Greičio ribotuvo derinimas</div><p class="svc-desc">Gamyklinio greičio ribotuvo pakeitimas arba pilnas išjungimas — pritaikome pagal jūsų poreikį.</p><div class="svc-foot"><span class="price">nuo 60€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">09</div><div class="svc-icon">📊</div><div class="svc-name">Dyno matavimas (atskirai)</div><p class="svc-desc">Galios ir sukimo momento matavimas ant 4×4 stendo, jei jums tiesiog reikia patikrinti automobilio realius rodiklius.</p><div class="svc-foot"><span class="price">nuo 40€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">10</div><div class="svc-icon">🛡️</div><div class="svc-name">ECU atrakinimas</div><p class="svc-desc">Užrakintų valdymo blokų (Continental SID212EVO ir kt.) atrakinimas, paruošimas programavimui ir flash'inimui.</p><div class="svc-foot"><span class="price">Individualiai</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">11</div><div class="svc-icon">📦</div><div class="svc-name">TCU programavimas</div><p class="svc-desc">Automatinės pavarų dėžės valdymo blokо derinimas kartu su ECU — sklandesni perjungimai ir geresnė dinamika.</p><div class="svc-foot"><span class="price">nuo 90€</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+        <div class="svc"><div class="svc-num">12</div><div class="svc-icon">🚚</div><div class="svc-name">Sunkioji technika</div><p class="svc-desc">Galios kėlimas ir AdBlue šalinimas vilkikams ir žemės ūkio technikai. Kuro sąnaudų optimizavimas ilgiems reisams.</p><div class="svc-foot"><span class="price">Individualiai</span><span class="lnk" onclick="openBooking()">Užklausa →</span></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+<!-- END SERVICES -->
+
+<!-- ══════════════════ GALLERY PAGE ══════════════════ -->
+<div id="gallery" class="page">
+  <div class="page-top">
+    <div class="wrap">
+      <div class="section-tag">[04] · Darbai · Galerija</div>
+      <h1 class="section-title">Iš mūsų <em>dirbtuvės</em></h1>
+      <p class="page-top-sub">Nuotraukos iš realių darbų — programavimas, dyno matavimai ir diagnostika kasdienėje praktikoje.</p>
+    </div>
+  </div>
+  <section>
+    <div class="wrap">
+      <div class="gal-grid">
+        <div class="gal-item"><img src="img/audi-dyno-night.jpg" alt="Audi ant dyno stendo"><div class="gal-cap">Audi · Dyno matavimas</div></div>
+        <div class="gal-item"><img src="img/bmw-x5-night.jpg" alt="BMW X5 dyno"><div class="gal-cap">BMW X5 · Naktinė sesija</div></div>
+        <div class="gal-item"><img src="img/bmw-ecu-graph.jpg" alt="BMW su ECU grafiku"><div class="gal-cap">BMW · ECU derinimo grafikas</div></div>
+        <div class="gal-item"><img src="img/dyno-room.jpg" alt="Dyno patalpa"><div class="gal-cap">Dyno stendo patalpa</div></div>
+        <div class="gal-item"><img src="img/kess-programmer.jpg" alt="KESS programatorius"><div class="gal-cap">KESS programavimo įranga</div></div>
+        <div class="gal-item"><img src="img/ecu-wires.jpg" alt="ECU su laidais"><div class="gal-cap">ECU nuskaitymas</div></div>
+        <div class="gal-item"><img src="img/skoda-night.jpg" alt="Škoda naktinis darbas"><div class="gal-cap">Škoda · Variklio darbai</div></div>
+        <div class="gal-item"><img src="img/opel-dyno.jpg" alt="Opel ant dyno"><div class="gal-cap">Opel · Dyno stendas</div></div>
+        <div class="gal-item"><img src="img/cabin-diag.jpg" alt="Diagnostika salone"><div class="gal-cap">Diagnostika · Ford Transit</div></div>
+        <div class="gal-item"><img src="img/transit-engine.jpg" alt="Ford Transit variklis"><div class="gal-cap">Ford Transit · Variklio darbai</div></div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-band">
+    <div class="wrap cta-inner">
+      <h2>Norite tokio<br>rezultato?</h2>
+      <div class="cta-actions">
+        <a href="tel:+37067799741" class="cta-phone">+370 677 99741</a>
+        <button class="btn btn-ghost" onclick="openBooking()">Siųsti užklausą</button>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="wrap">
+      <div class="foot-bottom" style="border-top:none;padding-top:0">
+        <span class="foot-copy">© 2026 Black Smoke Factory</span>
+        <span class="foot-copy foot-made">Demo · <span>built.lt</span></span>
+      </div>
+    </div>
+  </footer>
+</div>
+<!-- END GALLERY -->
+
+<!-- ══════════════════ ABOUT PAGE ══════════════════ -->
+<div id="about" class="page">
+  <div class="page-top">
+    <div class="wrap">
+      <div class="section-tag">Mūsų specializacija</div>
+      <h1 class="section-title">Apie <em>Black Smoke Factory</em></h1>
+      <p class="page-top-sub">Vilniuje, Daržininkuose dirbanti dirbtuvė, kuri specializuojasi išskirtinai variklių valdymo programavime — ne bendro pobūdžio autoservisas, o ChipTuning specialistai.</p>
+    </div>
+  </div>
+  <section>
+    <div class="wrap">
+      <div class="why-grid">
+        <div>
+          <p class="why-p"><strong>Black Smoke Factory</strong> – tai benzininių, dyzelinių ir elektrinių variklių galingumo optimizavimo dirbtuvė Vilniuje. Užsiimame tiksliai apibrėžta sritimi: ECU programavimu, ne visu autoserviso darbų spektru.</p>
+          <p class="why-p">Kiekvienas automobilis derinamas <strong>individualiai</strong> ant 4×4 dyno stendo — matome tikrus rezultatus, o ne tik žadame skaičius popieriuje. Originalus žemėlapis visada nuskaitomas ir saugomas prieš programavimą.</p>
+          <p class="why-p">Dirbame su <strong>KESS ir CMD Flash</strong> programavimo įranga, leidžiančia derinti net užrakintus valdymo blokus, su kuriais nesusitvarko dauguma servisų.</p>
+          <div class="why-list">
+            <div class="why-item">
+              <div class="why-icon">🎯</div>
+              <div class="why-text"><h4>Tik specializacija</h4><p>Nesiblaškome į kitas paslaugas — darome tai, ką darome, gerai</p></div>
+            </div>
+            <div class="why-item">
+              <div class="why-icon">📊</div>
+              <div class="why-text"><h4>Matavimas, ne pažadai</h4><p>Kiekvienas derinimas patvirtinamas ant dyno stendo, su grafiku rankose</p></div>
+            </div>
+            <div class="why-item">
+              <div class="why-icon">💾</div>
+              <div class="why-text"><h4>Backup visada saugomas</h4><p>Galimybė grįžti į gamyklinius nustatymus bet kuriuo metu</p></div>
+            </div>
+            <div class="why-item">
+              <div class="why-icon">🔓</div>
+              <div class="why-text"><h4>Sudėtingi atrakinimai</h4><p>Dirbame su užrakintais ECU blokais, kuriuos kiti servisai atmeta</p></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <img src="img/bmw-ecu-graph.jpg" alt="ECU programavimas" style="width:100%;border-radius:8px;border:1px solid var(--line2);margin-bottom:16px">
+          <img src="img/ecu-wires.jpg" alt="ECU nuskaitymas" style="width:100%;border-radius:8px;border:1px solid var(--line2)">
+        </div>
+      </div>
+
+      <div class="about-numbers">
+        <div class="an-cell"><div class="an-val">St1–St3</div><div class="an-label">Programų lygiai</div></div>
+        <div class="an-cell"><div class="an-val">4×4</div><div class="an-label">Dyno stendas</div></div>
+        <div class="an-cell"><div class="an-val">✓</div><div class="an-label">Backup saugomas</div></div>
+        <div class="an-cell"><div class="an-val">656+</div><div class="an-label">Instagram sekėjų</div></div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-band">
+    <div class="wrap cta-inner">
+      <h2>Susitarkime dėl<br>jūsų automobilio</h2>
+      <div class="cta-actions">
+        <a href="tel:+37067799741" class="cta-phone">+370 677 99741</a>
+        <button class="btn btn-ghost" onclick="openBooking()">Siųsti užklausą</button>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="wrap">
+      <div class="foot-bottom" style="border-top:none;padding-top:0">
+        <span class="foot-copy">© 2026 Black Smoke Factory</span>
+        <span class="foot-copy foot-made">Demo · <span>built.lt</span></span>
+      </div>
+    </div>
+  </footer>
+</div>
+<!-- END ABOUT -->
+
+<!-- ══════════════════ CONTACT PAGE ══════════════════ -->
+<div id="contact" class="page">
+  <div class="page-top">
+    <div class="wrap">
+      <div class="section-tag">Susisiekite</div>
+      <h1 class="section-title"><em>Kontaktai</em></h1>
+    </div>
+  </div>
+  <section>
+    <div class="wrap">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <h2>Susitarkime<br>dėl <em>vizito.</em></h2>
+          <div class="contact-items">
+            <div class="ci">
+              <div class="ci-icon">📞</div>
+              <div>
+                <div class="ci-label">Telefonas</div>
+                <div class="ci-val"><a href="tel:+37067799741">+370 677 99741</a></div>
+                <div class="ci-note">Skambinkite arba rašykite žinutę</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-icon">📘</div>
+              <div>
+                <div class="ci-label">Facebook</div>
+                <div class="ci-val"><a href="https://www.facebook.com/BlackSmokeFactory/" target="_blank">Black Smoke Factory</a></div>
+                <div class="ci-note">Naujausi darbai ir rezultatai</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-icon">📍</div>
+              <div>
+                <div class="ci-label">Adresas</div>
+                <div class="ci-val">Senojo kelio g. 1, Daržininkai</div>
+                <div class="ci-note">13281 Vilniaus r.</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:28px">
+            <div class="section-tag">Darbo laikas</div>
+            <div class="hours-box">
+              <div class="hours-row"><span class="day">Pirmadienis</span><span class="time">9:00 – 18:00</span></div>
+              <div class="hours-row"><span class="day">Antradienis</span><span class="time">9:00 – 18:00</span></div>
+              <div class="hours-row"><span class="day">Trečiadienis</span><span class="time">9:00 – 18:00</span></div>
+              <div class="hours-row"><span class="day">Ketvirtadienis</span><span class="time">9:00 – 18:00</span></div>
+              <div class="hours-row"><span class="day">Penktadienis</span><span class="time">9:00 – 18:00</span></div>
+              <div class="hours-row"><span class="day">Šeštadienis</span><span class="time">9:00 – 15:00</span></div>
+              <div class="hours-row"><span class="day">Sekmadienis</span><span class="time closed">Uždaryta</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="map-box">
+            <img src="img/dyno-room.jpg" alt="">
+            <div class="map-box-overlay">
+              <div class="map-box-icon">📍</div>
+              <div class="map-box-addr">Senojo kelio g. 1, Daržininkai</div>
+              <div class="map-box-city">UAB Black Smoke Factory</div>
+              <a href="https://www.google.com/maps/place/UAB+Black+Smoke+Factory/@54.6354248,25.363921,504m/data=!3m2!1e3!4b1!4m6!3m5!1s0x46dd937d832dde2f:0xd56a3397d56b229c!8m2!3d54.6354248!4d25.363921!16s%2Fg%2F11gb3pl_mk" target="_blank" class="map-link">Atidaryti Google Maps →</a>
+            </div>
+          </div>
+          <div class="f-row" style="margin-top:24px;display:block">
+            <button class="btn btn-primary" style="width:100%;padding:16px;font-size:15px" onclick="openBooking()">📋 Siųsti užklausą dabar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap">
+      <div class="foot-bottom" style="border-top:none;padding-top:0">
+        <span class="foot-copy">© 2026 Black Smoke Factory</span>
+        <span class="foot-copy foot-made">Demo · <span>built.lt</span></span>
+      </div>
+    </div>
+  </footer>
+</div>
+<!-- END CONTACT -->
+
+<!-- BOOKING POPUP -->
+<div class="pop-overlay" id="bookingPopup" onclick="overlayClose(event)">
+  <div class="pop">
+    <div class="pop-head">
+      <div>
+        <div class="pop-tag">Black Smoke Factory</div>
+        <div class="pop-title">Siųsti užklausą</div>
+      </div>
+      <button class="pop-close" onclick="closeBooking()">✕</button>
+    </div>
+    <div class="pop-body" id="popBody">
+      <div class="f-row">
+        <div class="f-group" style="margin-bottom:0"><label>Vardas</label><input type="text" placeholder="Jūsų vardas" id="p-name"></div>
+        <div class="f-group" style="margin-bottom:0"><label>Telefonas</label><input type="tel" placeholder="+370 6xx xxxxx" style="font-size:16px" id="p-phone"></div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="f-group"><label>Automobilis</label><input type="text" placeholder="pvz. BMW 525d, 2015m." id="p-car"></div>
+      <div class="f-group"><label>Paslauga</label>
+        <select id="p-service">
+          <option value="">Pasirinkite...</option>
+          <option>ChipTuning Stage1</option>
+          <option>ChipTuning Stage2</option>
+          <option>ChipTuning Stage3</option>
+          <option>EGR / DPF šalinimas</option>
+          <option>AdBlue OFF</option>
+          <option>Greičio ribotuvas</option>
+          <option>Dyno matavimas</option>
+          <option>Kita</option>
+        </select>
+      </div>
+      <div class="f-group"><label>Pastabos</label><textarea placeholder="Trumpai apibūdinkite, ko reikia..." rows="3" id="p-notes"></textarea></div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;margin-top:4px" onclick="submitBooking()">Siųsti užklausą →</button>
+      <p class="f-note">Perskambinsime darbo metu · Pr–Pt 9:00–18:00</p>
+    </div>
+    <div class="pop-success" id="popSuccess">
+      <div class="pop-success-icon">✅</div>
+      <div class="pop-success-title">Užklausa išsiųsta!</div>
+      <div class="pop-success-text">Susisieksime su jumis kuo greičiau.<br>Jei skubu — skambinkite <a href="tel:+37067799741" style="color:var(--red);font-weight:700">+370 677 99741</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el){el.classList.add('active');window.scrollTo({top:0,behavior:'instant'})}
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const nv=document.getElementById('nav-'+id);
+  if(nv)nv.classList.add('active');
+  return false;
+}
+function toggleMenu(){
+  const b=document.getElementById('burger'),m=document.getElementById('mobMenu');
+  const open=m.classList.toggle('open');
+  b.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('burger').classList.remove('open');
+  document.getElementById('mobMenu').classList.remove('open');
+  document.body.style.overflow='';
+}
+function openBooking(){
+  document.getElementById('bookingPopup').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeBooking(){
+  document.getElementById('bookingPopup').classList.remove('open');
+  document.body.style.overflow='';
+}
+function overlayClose(e){if(e.target===document.getElementById('bookingPopup'))closeBooking()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeBooking()});
+function submitBooking(){
+  document.getElementById('popBody').style.display='none';
+  document.getElementById('popSuccess').classList.add('show');
+}
+</script>
+</body>
+</html>
